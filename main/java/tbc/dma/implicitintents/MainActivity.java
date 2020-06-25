@@ -61,17 +61,26 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final EditText share = findViewById(R.id.editTextViewShare);
-        final Editable shareText =  share.getText();
+        final String shareText =  share.getText().toString();
         Button btnShare = findViewById(R.id.buttonShare);
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 generateToast("btnShare clicked "+ shareText);
                 intent = new Intent(Intent.ACTION_SEND);
+
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, shareText);
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Share Your Message.");
-                startActivity(Intent.createChooser(intent, "Message"));
+                intent.putExtra(Intent.EXTRA_TEXT, "Share Content");
+                intent.putExtra(Intent.EXTRA_SUBJECT, shareText);
+                if (intent.resolveActivity(getPackageManager()) == null) {
+                    startActivity(Intent.createChooser(intent, "No app found to share this content."));
+                }else{
+                    startActivity(intent);
+                }
+                Log.d("TAG", "onClick: "+intent.resolveActivity(getPackageManager()));
+
+
+
             }
         });
 
@@ -81,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                  generateToast("Camera button is clicked");
                  try {
-                    intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
                     if (intent.resolveActivity(getPackageManager()) != null) {
                         startActivityForResult(intent, 1);
                     }else{
@@ -118,11 +127,12 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+                Log.d("TAG", "onActivityResult: "+data.getExtras().keySet());
                 // BitMap is data structure of image file
                 // which stor the image in memory
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                //Bitmap photo = (Bitmap) data.getExtras().get("data");
                 // Set the image in imageview for display
-                cameraImage.setImageBitmap(photo);
+                //cameraImage.setImageBitmap(photo);
             }
         }catch (SecurityException ex)
         {
